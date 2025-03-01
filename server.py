@@ -42,12 +42,12 @@ async def process_image(images):
     output = mm_infer(
         processor[modal](images), instruct, model=model, tokenizer=tokenizer, do_sample=False, modal=modal)
 
-    try:
-        data = json.loads(output)
-    except json.JSONDecodeError:
-        data = {"fall": False, "person": False}
+    # try:
+    #     data = json.loads(output)
+    # except json.JSONDecodeError:
+    #     data = {"fall": False, "person": False}
 
-    return data
+    return output
 
 
 async def handler(websocket):
