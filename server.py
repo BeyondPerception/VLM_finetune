@@ -60,7 +60,7 @@ async def process_image(images):
             "content": [
                 {"type": "video", "video": {
                     "video_path": "/tmp/output.mp4", "fps": 30, "max_frames": 180}},
-                {"type": "text", "text": system_prompt},
+                {"type": "text", "text": instruct},
             ]
         },
     ]
