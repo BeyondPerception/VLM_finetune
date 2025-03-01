@@ -46,7 +46,9 @@ system_prompt = "Please describe what is happening in the video. If it seems lik
 async def process_image(images):
     # Convert PIL images to a video and save to /tmp/output.mp4
     video_path = "/tmp/output.mp4"
+    print("A")
     with ffmpeg.input('pipe:', format='image2pipe', framerate=30) as input_stream:
+        print("B")
         with ffmpeg.output(input_stream, video_path, vcodec='libx264') as output_stream:
             for image in images:
                 image_bytes = BytesIO()
@@ -114,6 +116,7 @@ async def handler(websocket):
             else:
                 await websocket.send(json.dumps({"error": "Invalid message type"}))
         except Exception as e:
+            print(e)
             await websocket.send(json.dumps({"error": str(e)}))
 
 
