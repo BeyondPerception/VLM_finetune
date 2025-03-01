@@ -5,8 +5,10 @@ import sys
 from io import BytesIO
 
 import ffmpeg
+import imageio.v3 as iio
 import torch
 import websockets
+import numpy as np
 from PIL import Image
 from transformers import AutoModelForCausalLM, AutoProcessor
 
@@ -47,15 +49,9 @@ async def process_image(images):
     # Convert PIL images to a video and save to /tmp/output.mp4
     video_path = "/tmp/output.mp4"
     print("A")
-    with ffmpeg.input('pipe:', format='image2pipe', framerate=30) as input_stream:
-        print("B")
-        with ffmpeg.output(input_stream, video_path, vcodec='libx264') as output_stream:
-            for image in images:
-                image_bytes = BytesIO()
-                image.save(image_bytes, format='JPEG')
-                input_stream.write(image_bytes.getvalue())
-            input_stream.close()
-            output_stream.run()
+    frames = [np.array(img) for img in images]
+    fps = 30
+    iio.imwrite(video_path, frames, fps=fps)
 
     conversation = [
         {"role": "system", "content": "You are a helpful assistnt."},
