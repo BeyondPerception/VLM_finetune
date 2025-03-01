@@ -1,7 +1,12 @@
-FROM pytorch/pytorch:2.6.0-cuda11.8-cudnn9-devel
+FROM pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
 
-RUN pip install "https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.2.post1/flash_attn-2.7.2.post1+cu11torch2.1cxx11abiTRUE-cp311-cp311-linux_x86_64.whl"
-RUN pip install transformers==4.46.3 accelerate==1.0.1
-RUN pip install decord ffmpeg-python imageio opencv-python
+RUN apt update && apt install -y git
 
-CMD "python tune.py"
+RUN git clone https://github.com/DAMO-NLP-SG/VideoLLaMA2 && \
+    cd VideoLLaMA2 && \
+    pip install --upgrade pip && \
+    pip install -e . && \
+    pip install "https://github.com/Dao-AILab/flash-attention/releases/download/v2.5.8/flash_attn-2.5.8+cu118torch2.2cxx11abiFALSE-cp310-cp310-linux_x86_64.whl"
+
+
+CMD "/bin/bash 'sleep 2d'"

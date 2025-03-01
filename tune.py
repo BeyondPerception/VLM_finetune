@@ -1,40 +1,24 @@
-import torch
-from transformers import AutoModelForCausalLM, AutoProcessor
+from videollama2.utils import disable_torch_init
+from videollama2 import model_init, mm_infer
+import sys
+sys.path.append('./')
 
-device = "cuda:0"
-model_path = "/volume/VideoLLaMA3-7B"
-model = AutoModelForCausalLM.from_pretrained(
-    model_path,
-    trust_remote_code=True,
-    device_map={"": device},
-    torch_dtype=torch.bfloat16,
-    attn_implementation="flash_attention_2",
-)
-processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True)
 
-conversation = [
-    {"role": "system", "content": "You are a helpful assistant."},
-    {
-        "role": "user",
-        "content": [
-            {"type": "video", "video": {
-                "video_path": "./dataset/Subject 4/Fall/01.mp4", "fps": 30, "max_frames": 180}},
-            {"type": "text", "text": "What is happening in the video?"},
-        ]
-    },
-]
+def inference():
+    disable_torch_init()
 
-inputs = processor(
-    conversation=conversation,
-    add_system_prompt=True,
-    add_generation_prompt=True,
-    return_tensors="pt"
-)
-inputs = {k: v.to(device) if isinstance(v, torch.Tensor)
-          else v for k, v in inputs.items()}
-if "pixel_values" in inputs:
-    inputs["pixel_values"] = inputs["pixel_values"].to(torch.bfloat16)
-output_ids = model.generate(**inputs, max_new_tokens=1024)
-response = processor.batch_decode(
-    output_ids, skip_special_tokens=True)[0].strip()
-print(response)
+    # Video Inference
+    modal = 'video'
+    modal_path = '/volume/VLM_finetune/dataset/Subject 4/Fall/01.mp4'
+    instruct = 'What is happening in the video? Does someone fall down?'
+
+    model_path = '/volume/VideoLLaMA2.1-7B-16F'
+    model, processor, tokenizer = model_init(model_path)
+    output = mm_infer(processor[modal](
+        modal_path), instruct, model=model, tokenizer=tokenizer, do_sample=False, modal=modal)
+
+    print(output)
+
+
+if __name__ == "__main__":
+    inference()
