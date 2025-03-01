@@ -62,7 +62,7 @@ async def handler(websocket):
 
 
 async def main():
-    server = await websockets.serve(handler, "localhost", 8765, max_size=1e9)
+    server = await websockets.serve(handler, "0.0.0.0", 8765, max_size=1e9)
     print("WebSocket server started on ws://localhost:8765")
     await server.wait_closed()
 
