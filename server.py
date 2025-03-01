@@ -35,20 +35,17 @@ PLEASE RESPOND IN JSON FORMAT and do not include any other text.
 Example: Someone falls down
 Output: "{"fall": true, "person": true}"
 
-Example: Video is empty
+Example: Room is empty
 Output: "{"fall": false, "person": false}"
 
 Example: People in video, but no one falls
 Output: "{"fall": false, "person": true}"
 """
 
-system_prompt = "Please describe what is happening in the video. If it seems like nothing is happening, or the frame is empty, please indicate that as well."
-
 
 async def process_image(images):
     # Convert PIL images to a video and save to /tmp/output.mp4
     video_path = "/tmp/output.mp4"
-    print("A")
     frames = [np.array(img) for img in images]
     fps = 30
     iio.imwrite(video_path, frames, fps=fps)
@@ -84,14 +81,13 @@ async def process_image(images):
     output_ids = model.generate(**inputs, max_new_tokens=1024)
     response = processor.batch_decode(
         output_ids, skip_special_tokens=True)[0].strip()
-    print(response)
 
-    # try:
-    #     data = json.loads(output)
-    # except json.JSONDecodeError:
-    #     data = {"fall": False, "person": False}
+    try:
+        data = json.loads(response)
+    except json.JSONDecodeError:
+        data = {"fall": False, "person": False}
 
-    return response
+    return data
 
 
 async def handler(websocket):
