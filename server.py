@@ -15,7 +15,6 @@ disable_torch_init()
 
 # Model setup
 modal = 'video'
-modal_path = '/volume/VLM_finetune/dataset/Subject 4/ADL/01.mp4'
 # instruct = """You are monitoring a camera feed for an old persons home. Watch the video,
 # and determine if someone is falling or has fallen.
 
@@ -41,7 +40,7 @@ model, processor, tokenizer = model_init(model_path)
 
 async def process_image(images):
     output = mm_infer(
-        processor[modal](modal_path), instruct, model=model, tokenizer=tokenizer, do_sample=False, modal=modal)
+        processor[modal](images), instruct, model=model, tokenizer=tokenizer, do_sample=False, modal=modal)
 
     # try:
     #     data = json.loads(output)
