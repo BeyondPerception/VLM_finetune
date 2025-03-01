@@ -10,7 +10,11 @@ def inference():
     # Video Inference
     modal = 'video'
     modal_path = '/volume/VLM_finetune/dataset/Subject 4/Fall/01.mp4'
-    instruct = 'What is happening in the video? Does someone fall down?'
+    instruct = """What is happening in the video? Does someone fall down? PLEASE RESPOND IN JSON FORMAT
+    
+    Example: Someone falls down
+    Output: "{"fall": true}"
+    """
 
     model_path = '/volume/VideoLLaMA2.1-7B-16F'
     model, processor, tokenizer = model_init(model_path)
