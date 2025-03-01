@@ -19,7 +19,7 @@ conversation = [
         "role": "user",
         "content": [
             {"type": "video", "video": {
-                "video_path": "./volume/dataset/Subject 4/Fall/01.mp4", "fps": 30, "max_frames": 180}},
+                "video_path": "./volume/VLM_finetune/dataset/Subject 4/Fall/01.mp4", "fps": 30, "max_frames": 180}},
             {"type": "text", "text": "What is happening in the video?"},
         ]
     },
