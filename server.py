@@ -32,7 +32,7 @@ modal = 'video'
 # Output: "{"fall": false, "person": true}"
 # """
 
-instruct = "Please describe what is happening in the video."
+instruct = "Please describe what is happening in the video. If it seems like nothing is happening, or the frame is empty, please indicate that as well."
 
 model_path = '/volume/VideoLLaMA2.1-7B-16F'
 model, processor, tokenizer = model_init(model_path)
