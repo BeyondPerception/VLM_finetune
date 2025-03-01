@@ -36,6 +36,9 @@ except ffmpeg.Error as e:
     print(e.stderr)
     import sys
     sys.exit(1)
+
+print(inputs)
+
 inputs = {k: v.to(device) if isinstance(v, torch.Tensor)
           else v for k, v in inputs.items()}
 if "pixel_values" in inputs:
