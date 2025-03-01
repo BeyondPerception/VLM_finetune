@@ -16,12 +16,21 @@ disable_torch_init()
 # Model setup
 modal = 'video'
 modal_path = '/volume/VLM_finetune/dataset/Subject 4/ADL/01.mp4'
-instruct = """What is happening in the video? Identify if there is a person in the frame, and if someone falls down?
+instruct = """You are monitoring a camera feed for an old persons home. Watch the video,
+and determine if someone is falling or has fallen.
+
+Identify if there is a person in the frame, and if someone falls down.
 
 PLEASE RESPOND IN JSON FORMAT and do not include any other text.
 
 Example: Someone falls down
 Output: "{"fall": true, "person": true}"
+
+Example: Video is empty
+Output: "{"fall": false, "person": false}"
+
+Example: People in video, but no one falls
+Output: "{"fall": false, "person": true}"
 """
 
 model_path = '/volume/VideoLLaMA2.1-7B-16F'
