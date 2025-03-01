@@ -40,35 +40,60 @@ Example: People in video, but no one falls
 Output: "{"fall": false, "person": true}"
 """
 
-instruct = "Please describe what is happening in the video. If it seems like nothing is happening, or the frame is empty, please indicate that as well."
-
-conversation = [
-    {"role": "system", "content": "You are a helpful assistant."},
-    {
-        "role": "user",
-        "content": [
-            {"type": "video", "video": {
-                "video_path": "/volume/VLM_finetune/dataset/Subject 4/Fall/01.mp4", "fps": 30, "max_frames": 180}},
-            {"type": "text", "text": "What is happening in the video?"},
-        ]
-    },
-]
-
-
-model_path = '/volume/VideoLLaMA2.1-7B-16F'
-model, processor, tokenizer = model_init(model_path)
+system_prompt = "Please describe what is happening in the video. If it seems like nothing is happening, or the frame is empty, please indicate that as well."
 
 
 async def process_image(images):
-    output = mm_infer(
-        processor[modal](images), instruct, model=model, tokenizer=tokenizer, do_sample=False, modal=modal)
+    # Convert PIL images to a video and save to /tmp/output.mp4
+    video_path = "/tmp/output.mp4"
+    with ffmpeg.input('pipe:', format='image2pipe', framerate=30) as input_stream:
+        with ffmpeg.output(input_stream, video_path, vcodec='libx264') as output_stream:
+            for image in images:
+                image_bytes = BytesIO()
+                image.save(image_bytes, format='JPEG')
+                input_stream.write(image_bytes.getvalue())
+            input_stream.close()
+            output_stream.run()
+
+    conversation = [
+        {"role": "system", "content": "You are a helpful assistnt."},
+        {
+            "role": "user",
+            "content": [
+                {"type": "video", "video": {
+                    "video_path": "/tmp/output.mp4", "fps": 30, "max_frames": 180}},
+                {"type": "text", "text": system_prompt},
+            ]
+        },
+    ]
+
+    try:
+        inputs = processor(
+            conversation=conversation,
+            add_system_prompt=True,
+            add_generation_prompt=True,
+            return_tensors="pt"
+        )
+    except ffmpeg.Error as e:
+        print(e.stderr)
+        import sys
+        sys.exit(1)
+
+    inputs = {k: v.to(device) if isinstance(v, torch.Tensor)
+              else v for k, v in inputs.items()}
+    if "pixel_values" in inputs:
+        inputs["pixel_values"] = inputs["pixel_values"].to(torch.bfloat16)
+    output_ids = model.generate(**inputs, max_new_tokens=1024)
+    response = processor.batch_decode(
+        output_ids, skip_special_tokens=True)[0].strip()
+    print(response)
 
     # try:
     #     data = json.loads(output)
     # except json.JSONDecodeError:
     #     data = {"fall": False, "person": False}
 
-    return output
+    return response
 
 
 async def handler(websocket):
