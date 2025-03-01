@@ -18,8 +18,8 @@ conversation = [
         "role": "user",
         "content": [
             {"type": "video", "video": {
-                "video_path": "./assets/cat_and_chicken.mp4", "fps": 1, "max_frames": 180}},
-            {"type": "text", "text": "What is the cat doing?"},
+                "video_path": "./volume/dataset/Subject 4/01.mp4", "fps": 30, "max_frames": 180}},
+            {"type": "text", "text": "What is happening in the video?"},
         ]
     },
 ]
