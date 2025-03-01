@@ -1,5 +1,6 @@
 import torch
 from transformers import AutoModelForCausalLM, AutoProcessor
+import ffmpeg
 
 device = "cuda:0"
 model_path = "/volume/VideoLLaMA3-7B"
@@ -24,12 +25,17 @@ conversation = [
     },
 ]
 
-inputs = processor(
-    conversation=conversation,
-    add_system_prompt=True,
-    add_generation_prompt=True,
-    return_tensors="pt"
-)
+try:
+    inputs = processor(
+        conversation=conversation,
+        add_system_prompt=True,
+        add_generation_prompt=True,
+        return_tensors="pt"
+    )
+except ffmpeg.Error as e:
+    print(e.stderr)
+    import sys
+    sys.exit(1)
 inputs = {k: v.to(device) if isinstance(v, torch.Tensor)
           else v for k, v in inputs.items()}
 if "pixel_values" in inputs:
